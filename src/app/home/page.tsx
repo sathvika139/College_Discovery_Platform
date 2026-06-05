@@ -3,7 +3,7 @@ import Pagination from "@/components/Pagination";
 import Link from "next/link";
 import CompareClient from "@/components/CompareClient";
 import SaveButton from "@/components/SaveButton";
-import { headers } from "next/headers";
+import { prisma } from "@/lib/prisma";
 
 type College = {
   id: string;
@@ -14,20 +14,18 @@ type College = {
 };
 
 async function getColleges(search: string, page: string) {
-  const headersList = await headers();
+  const limit = 2;
 
-  const host = headersList.get("host");
-
-  const protocol = process.env.NODE_ENV === "development" ? "http" : "https";
-
-  const res = await fetch(
-    `${protocol}://${host}/api/colleges?search=${search}&page=${page}`,
-    {
-      cache: "no-store",
+  return prisma.college.findMany({
+    where: {
+      name: {
+        contains: search,
+        mode: "insensitive",
+      },
     },
-  );
-
-  return res.json();
+    skip: (Number(page) - 1) * limit,
+    take: limit,
+  });
 }
 
 export default async function Home({

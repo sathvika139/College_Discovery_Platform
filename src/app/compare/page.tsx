@@ -1,29 +1,21 @@
 import Link from "next/link";
-import { headers } from "next/headers";
+import { prisma } from "@/lib/prisma";
 
 type SearchParams = Promise<{
   ids?: string;
 }>;
 
 async function getComparedColleges(ids: string[]) {
-  const headersList = await headers();
-
-  const host = headersList.get("host");
-
-  const protocol = process.env.NODE_ENV === "development" ? "http" : "https";
-
-  const res = await fetch(`${protocol}://${host}/api/compare`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
+  return prisma.college.findMany({
+    where: {
+      id: {
+        in: ids,
+      },
     },
-    body: JSON.stringify({
-      ids,
-    }),
-    cache: "no-store",
+    include: {
+      placements: true,
+    },
   });
-
-  return res.json();
 }
 
 export default async function ComparePage({

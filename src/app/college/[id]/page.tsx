@@ -1,4 +1,4 @@
-import { headers } from "next/headers";
+import { fetchCollege } from "@/services/college.service";
 type College = {
   id: string;
   name: string;
@@ -27,19 +27,8 @@ type College = {
 };
 
 async function getCollege(id: string) {
-  const headersList = await headers();
-
-  const host = headersList.get("host");
-
-  const protocol = process.env.NODE_ENV === "development" ? "http" : "https";
-
-  const res = await fetch(`${protocol}://${host}/api/colleges/${id}`, {
-    cache: "no-store",
-  });
-
-  return res.json();
+  return fetchCollege(id);
 }
-
 export default async function CollegePage({
   params,
 }: {
@@ -47,7 +36,15 @@ export default async function CollegePage({
 }) {
   const { id } = await params;
 
-  const college: College = await getCollege(id);
+  const college = await getCollege(id);
+
+  if (!college) {
+    return (
+      <main className="p-10">
+        <h1>College Not Found</h1>
+      </main>
+    );
+  }
 
   return (
     <main className="max-w-7xl mx-auto p-8">

@@ -1,11 +1,18 @@
 import Link from "next/link";
+import { headers } from "next/headers";
 
 type SearchParams = Promise<{
   ids?: string;
 }>;
 
 async function getComparedColleges(ids: string[]) {
-  const res = await fetch("http://localhost:3000/api/compare", {
+  const headersList = await headers();
+
+  const host = headersList.get("host");
+
+  const protocol = process.env.NODE_ENV === "development" ? "http" : "https";
+
+  const res = await fetch(`${protocol}://${host}/api/compare`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

@@ -1,3 +1,4 @@
+import { headers } from "next/headers";
 type College = {
   id: string;
   name: string;
@@ -26,7 +27,13 @@ type College = {
 };
 
 async function getCollege(id: string) {
-  const res = await fetch(`http://localhost:3000/api/colleges/${id}`, {
+  const headersList = await headers();
+
+  const host = headersList.get("host");
+
+  const protocol = process.env.NODE_ENV === "development" ? "http" : "https";
+
+  const res = await fetch(`${protocol}://${host}/api/colleges/${id}`, {
     cache: "no-store",
   });
 

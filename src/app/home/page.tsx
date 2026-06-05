@@ -3,6 +3,7 @@ import Pagination from "@/components/Pagination";
 import Link from "next/link";
 import CompareClient from "@/components/CompareClient";
 import SaveButton from "@/components/SaveButton";
+import { headers } from "next/headers";
 
 type College = {
   id: string;
@@ -13,8 +14,14 @@ type College = {
 };
 
 async function getColleges(search: string, page: string) {
+  const headersList = await headers();
+
+  const host = headersList.get("host");
+
+  const protocol = process.env.NODE_ENV === "development" ? "http" : "https";
+
   const res = await fetch(
-    `http://localhost:3000/api/colleges?search=${search}&page=${page}`,
+    `${protocol}://${host}/api/colleges?search=${search}&page=${page}`,
     {
       cache: "no-store",
     },
